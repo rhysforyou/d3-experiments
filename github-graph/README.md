@@ -1,0 +1,3 @@
+# Force Directed GitHub Network Graph
+
+Here's a simple project I've been working on this weekend to _finally_ learn D3.js. What you see here is a graph of repos and users that contribute to them with the repos displayed in blue and users in orange. You can click any repo to see it's commiters and any commiter to see repos they've commited to. It's pretty basic now, but I hope to turn it into a cool and unique way to browse GitHub repos.
