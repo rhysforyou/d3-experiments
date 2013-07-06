@@ -156,6 +156,7 @@ function flatten(root) {
 
 // Toggle children on click.
 function click(d) {
+  console.log(d.id)
   if (!d.expanded) {
     expandNode(d)
   } else if (d.children) {
@@ -182,6 +183,7 @@ function expandNode(d) {
     var response = JSON.parse(xhr.response);
     response.forEach(function(node) {
       node.type = (d.type === "repo" ? "user" : "repo");
+      node.id = d.id + "-" + node.id;
       if (node.type === "user") {
         node.size = node.contributions;
       }
