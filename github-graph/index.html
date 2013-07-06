@@ -172,7 +172,7 @@ function click(d) {
 // Load more remote info about a node.
 function expandNode(d) {
   if (d.type === "repo") {
-    var url = "https://api.github.com/repos/" + d.full_name + "/contributors"
+    var url = "https://api.github.com/repos/" + d.full_name + "/contributors?anon=1"
   } else if (d.type === "user") {
     var url = "https://api.github.com/users/" + d.login + "/repos"
   } else {
