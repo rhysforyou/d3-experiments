@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Explore GitHub</title>
+
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+
+    <style type="text/css">
+
+circle.node {
+  cursor: pointer;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+line.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var w = 1280,
+    h = 800,
+    node,
+    link,
+    root;
+
+var force = d3.layout.force()
+    .on("tick", tick)
+    .charge(function(d) { return d._children ? d.size / 50 : -30; })
+    .linkDistance(function(d) { return d.target._children ? 80 : 30; })
+    .size([w, h - 160]);
+
+var svg = d3.select("body").append("svg:svg")
+    .attr("width", w)
+    .attr("height", h);
+
+d3.xhr("https://api.github.com/repos/mbostock/d3", "application/vnd.github.beta+json", function(xhr) {
+  root = JSON.parse(xhr.response);
+  root.fixed = true;
+  root.x = w / 2;
+  root.y = h / 2 - 80;
+  root.type = "repo"
+  update();
+});
+
+function update() {
+  var nodes = flatten(root),
+      links = d3.layout.tree().links(nodes);
+
+  // Restart the force layout…
+  force
+      .nodes(nodes)
+      .links(links)
+      .start();
+
+  // Update the links…
+  link = svg.selectAll("line.link")
+      .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links…
+  link.enter().insert("svg:line", ".node")
+      .attr("class", "link")
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  // Exit any old links…
+  link.exit().remove();
+
+  node = svg.selectAll("circle.node")
+      .data(nodes, function(d) { return d.id; })
+      .style("fill", color)
+
+  node.transition()
+      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 5; });
+
+  // Enter any new nodes…
+  node.enter().append("svg:circle")
+      .attr("class", "node")
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 5; })
+      .style("fill", color)
+      .on("click", click)
+      .call(force.drag);
+
+  // Exit any old nodes…
+  node.exit().remove();
+}
+
+function tick() {
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+}
+
+
+function color(d) {
+  if (d.type === "repo") {
+    return "#3498DB";
+  } else if (d.type === "user") {
+    return "#E74C3C"
+  } else {
+    return "#F0F";
+  }
+}
+
+// Returns a list of all nodes under the root.
+function flatten(root) {
+  var nodes = [], i = 0;
+
+  function recurse(node) {
+    if (node.children) node.size = node.children.reduce(function(p, v) { return p + recurse(v); }, 0);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+    return node.size;
+  }
+
+  root.size = recurse(root);
+  return nodes;
+}
+
+// Toggle children on click.
+function click(d) {
+  if (!d.expanded) {
+    expandNode(d)
+  } else if (d.children) {
+    d._children = d.children;
+    d.children = null;
+  } else {
+    d.children = d._children;
+    d._children = null;
+  }
+  update();
+}
+
+// Load more remote info about a node.
+function expandNode(d) {
+  if (d.type === "repo") {
+    var url = "https://api.github.com/repos/" + d.full_name + "/contributors"
+  } else if (d.type === "user") {
+    var url = "https://api.github.com/users/" + d.login + "/starred"
+  } else {
+    return;
+  }
+
+  d3.xhr(url, "application/vnd.github.beta+json", function(xhr) {
+    var response = JSON.parse(xhr.response);
+    response.forEach(function(node) {
+      node.type = (d.type === "repo" ? "user" : "repo");
+      if (node.type === "user") {
+        node.size = node.contributions;
+      }
+    });
+
+    d.children = response;
+    d.expanded = true;
+
+    update();
+  });
+}
+
+    </script>
+  </body>
+</html>
