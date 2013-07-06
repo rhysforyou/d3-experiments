@@ -7,6 +7,10 @@
 
     <style type="text/css">
 
+body {
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
 circle.node {
   cursor: pointer;
   stroke: #000;
@@ -17,6 +21,14 @@ line.link {
   fill: none;
   stroke: #9ecae1;
   stroke-width: 1.5px;
+}
+
+div#chart-tooltip {
+  background: #000;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 14px;
 }
 
     </style>
@@ -39,6 +51,12 @@ var force = d3.layout.force()
 var svg = d3.select("body").append("svg:svg")
     .attr("width", w)
     .attr("height", h);
+
+var tooltip = d3.select("body").append("div")
+    .attr("id", "chart-tooltip")
+    .style("position", "absolute")
+    .style("opacity", "0.0")
+    .style("pointer-events", "none");
 
 d3.xhr("https://api.github.com/repos/mbostock/d3", "application/vnd.github.beta+json", function(xhr) {
   root = JSON.parse(xhr.response);
@@ -89,6 +107,9 @@ function update() {
       .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 5; })
       .style("fill", color)
       .on("click", click)
+      .on("mouseover", showTooltip)
+      .on("mousemove", moveTooltip)
+      .on("mouseout", hideTooltip)
       .call(force.drag);
 
   // Exit any old nodes…
@@ -169,6 +190,35 @@ function expandNode(d) {
 
     update();
   });
+}
+
+function showTooltip(d) {
+  // Move the tooltip into place…
+  tooltip
+      .style("left", d3.event.pageX + "px")
+      .style("top", d3.event.pageY + "px")
+
+  if (d.type === "repo") {
+    tooltip.text(d.full_name)
+  } else {
+    tooltip.text(d.login)
+  }
+
+  // Fade the tooltip in…
+  tooltip.transition()
+      .style("opacity", 0.7)
+}
+
+function moveTooltip(d) {
+  // Move the tooltip into place…
+  tooltip
+      .style("left", d3.event.pageX + 16 + "px")
+      .style("top", d3.event.pageY + "px")
+}
+
+function hideTooltip(d) {
+  tooltip.transition()
+    .style("opacity", "0.0");
 }
 
     </script>
