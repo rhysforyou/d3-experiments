@@ -22,7 +22,7 @@ circle.node {
 line.link {
   fill: none;
   stroke: #9ecae1;
-  stroke-width: 1.5px;
+  stroke-width: 0.5px;
 }
 
 div#chart-tooltip {
@@ -60,7 +60,7 @@ var tooltip = d3.select("body").append("div")
     .style("opacity", "0.0")
     .style("pointer-events", "none");
 
-d3.xhr("https://api.github.com/repos/mbostock/d3", "application/vnd.github.beta+json", function(xhr) {
+d3.xhr("https://api.github.com/repos/AFNetworking/AFNetworking", "application/vnd.github.beta+json", function(xhr) {
   root = JSON.parse(xhr.response);
   root.fixed = true;
   root.x = w / 2;
@@ -99,14 +99,14 @@ function update() {
       .style("fill", color)
 
   node.transition()
-      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 5; });
+      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 2; });
 
   // Enter any new nodes…
   node.enter().append("svg:circle")
       .attr("class", "node")
       .attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; })
-      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 5; })
+      .attr("r", function(d) { return d.children ? 4.5 : Math.sqrt(d.size) / 2; })
       .style("fill", color)
       .on("click", click)
       .on("mouseover", showTooltip)
