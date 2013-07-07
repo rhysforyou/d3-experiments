@@ -7,8 +7,28 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 
     <link href="main.css" rel="stylesheet" type="text/css">
+
+    <style type="text/css">
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+    </style>
   </head>
   <body>
     <script src="main.js"></script>
+    <script>
+
+var graph = GitHubGraph()
+    .width($(window).width())
+    .height($(window).height())
+    .repo("AFNetworking/AFNetworking");
+
+d3.select('body').call(graph);
+
+    </script>
   </body>
 </html>

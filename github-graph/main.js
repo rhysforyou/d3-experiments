@@ -214,17 +214,6 @@ function GitHubGraph() {
       .style("opacity", "0.0");
   }
 
-  function getURLParameter(name) {
-      return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
-  }
-
   return graph;
 }
-
-var graph = GitHubGraph()
-    .width(1200)
-    .height(600)
-    .repo("mbostock/d3");
-
-d3.select('body').call(graph);
 
