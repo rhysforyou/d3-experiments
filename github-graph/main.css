@@ -1,0 +1,33 @@
+circle.node {
+  cursor: pointer;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+line.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 0.5px;
+}
+
+div#chart-tooltip {
+  background: #000;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+div#repo-form {
+  width: 200px;
+  margin: auto;
+  margin-top: 200px;
+}
+
+div#repo-form input {
+  width: 200px;
+}
+
+div.tooltip {
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
