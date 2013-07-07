@@ -46,8 +46,8 @@ var w = 1200,
 
 var force = d3.layout.force()
     .on("tick", tick)
-    .charge(function(d) { return d._children ? d.size / 50 : -30; })
-    .linkDistance(function(d) { return d.target._children ? 80 : 30; })
+    .charge(function(d) { return d._children ? -d.size / 50 : -30; })
+    .linkDistance(function(d) { return d.target.children ? 80 : 30; })
     .size([w, h - 160]);
 
 var svg = d3.select("body").append("svg:svg")
@@ -144,13 +144,11 @@ function flatten(root) {
   var nodes = [], i = 0;
 
   function recurse(node) {
-    if (node.children) node.size = node.children.reduce(function(p, v) { return p + recurse(v); }, 0);
-    if (!node.id) node.id = ++i;
+    if (node.children) node.children.forEach(recurse);
     nodes.push(node);
-    return node.size;
   }
 
-  root.size = recurse(root);
+  recurse(root);
   return nodes;
 }
 
@@ -186,6 +184,8 @@ function expandNode(d) {
       node.id = d.id + "-" + node.id;
       if (node.type === "user") {
         node.size = node.contributions;
+      } else if (node.type === "repo") {
+        node.size = node.watchers;
       }
     });
 
