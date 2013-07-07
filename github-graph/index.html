@@ -3,7 +3,8 @@
     <meta charset="utf-8">
     <title>Explore GitHub</title>
 
-    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 
     <style type="text/css">
 
@@ -33,9 +34,26 @@ div#chart-tooltip {
   font-size: 14px;
 }
 
+div#repo-form {
+  width: 200px;
+  margin: auto;
+  margin-top: 200px;
+}
+
+div#repo-form input {
+  width: 200px;
+}
+
     </style>
   </head>
   <body>
+    <div id="repo-form">
+      <form>
+        <input name="repo" type="text" placeholder="mbostock/d3">
+        <p><input type="submit" value="Start"></p>
+      </form>
+    </div>
+
     <script type="text/javascript">
 
 var w = 1200,
@@ -60,14 +78,35 @@ var tooltip = d3.select("body").append("div")
     .style("opacity", "0.0")
     .style("pointer-events", "none");
 
-d3.xhr("https://api.github.com/repos/AFNetworking/AFNetworking", "application/vnd.github.beta+json", function(xhr) {
-  root = JSON.parse(xhr.response);
-  root.fixed = true;
-  root.x = w / 2;
-  root.y = h / 2 - 80;
-  root.type = "repo"
-  update();
+if (getURLParameter("repo")) {
+  $("#repo-form").css("display", "none");
+  startGraph(getURLParameter("repo"));
+}
+
+window.addEventListener('popstate', function(event) {
+  console.log('popstate fired!');
+  console.log(event)
 });
+
+$("#repo-form form").submit(function(event) {
+  event.preventDefault();
+  repoPath = $(event.target).find("input").val();
+  $("#repo-form").css("display", "none");
+  window.history.pushState('graph', repoPath, "?repo=" + repoPath);
+  startGraph(repoPath);
+});
+
+function startGraph(rootRepo) {
+  d3.xhr("https://api.github.com/repos/" + rootRepo, "application/vnd.github.beta+json", function(xhr) {
+    root = JSON.parse(xhr.response);
+    root.fixed = true;
+    root.x = w / 2;
+    root.y = h / 2 - 80;
+    root.type = "repo"
+    update();
+  });
+}
+
 
 function update() {
   var nodes = flatten(root),
@@ -223,6 +262,10 @@ function moveTooltip(d) {
 function hideTooltip(d) {
   tooltip.transition()
     .style("opacity", "0.0");
+}
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
     </script>
