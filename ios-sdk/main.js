@@ -30,16 +30,16 @@ function ReingoldTilfordTree() {
           .data(nodes)
         .enter().append("g")
           .attr("class", "node")
-          .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+          .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")" })
 
       node.append("circle")
-          .attr("r", 4.5);
+          .attr("r", 4.5)
 
       node.append("text")
           .attr("dy", ".31em")
-          .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-          .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-          .text(function(d) { return d.name; });
+          .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end" })
+          .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)" })
+          .text(function(d) { return d.name })
 
     })
   }
